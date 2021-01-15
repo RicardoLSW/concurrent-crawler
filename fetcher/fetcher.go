@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"golang.org/x/text/encoding/unicode"
 
@@ -15,7 +16,9 @@ import (
 	"golang.org/x/text/transform"
 )
 
+var rateLimiter = time.Tick(100 * time.Millisecond)
 func Fetch(url string) ([]byte, error) {
+	<- rateLimiter
 	client := &http.Client{}
 	newUrl := strings.Replace(url, "http://", "https://", 1)
 	request, err := http.NewRequest(http.MethodGet, newUrl, nil)
