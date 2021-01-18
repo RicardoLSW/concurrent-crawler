@@ -50,3 +50,9 @@ func parseProfile(contents []byte, name string, url string) engine.ParseResult {
 	})
 	return result
 }
+
+func ProfileParser(name string) engine.ParserFunc {
+	return func(c []byte, url string) engine.ParseResult {
+		return parseProfile(c, url, name)
+	}
+}

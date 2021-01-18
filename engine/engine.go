@@ -1,11 +1,5 @@
 package engine
 
-import (
-	"log"
-
-	"concurrent-crawler/fetcher"
-)
-
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
@@ -65,16 +59,6 @@ func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 			out <- result
 		}
 	}()
-}
-
-func worker(r Request) (ParseResult, error) {
-	//log.Printf("Fetching %s", r.Url)
-	body, err := fetcher.Fetch(r.Url)
-	if err != nil {
-		log.Printf("Fetcher: err fetching url %s: %v", r.Url, err)
-		return ParseResult{}, err
-	}
-	return r.ParserFunc(body), nil
 }
 
 var visitedUrls = make(map[string]bool)
