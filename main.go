@@ -8,7 +8,11 @@ import (
 )
 
 func main() {
-	concurrentEngine := engine.ConcurrentEngine{Scheduler: &scheduler.QueuedScheduler{}, WorkerCount: 100, ItemChan: persist.ItemSaver()}
+	itemSaver, err := persist.ItemSaver()
+	if err != nil {
+		panic(err)
+	}
+	concurrentEngine := engine.ConcurrentEngine{Scheduler: &scheduler.QueuedScheduler{}, WorkerCount: 10, ItemChan: itemSaver}
 	//concurrentEngine.Run(engine.Request{
 	//	Url:        "http://www.zhenai.com/zhenghun",
 	//	ParserFunc: parser.ParseCityList,

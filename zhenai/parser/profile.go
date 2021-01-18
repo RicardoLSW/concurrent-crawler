@@ -9,7 +9,9 @@ import (
 
 var userInfoRe = regexp.MustCompile(`<div class="m-btn purple" data-v-8b1eac0c>([^<]+)</div>`)
 
-func parseProfile(contents []byte, name string) engine.ParseResult {
+var idUrlRe = regexp.MustCompile(`http://album.zhenai.com/u/([0-9]+)`)
+
+func parseProfile(contents []byte, name string, url string) engine.ParseResult {
 	match := userInfoRe.FindAllSubmatch(contents, -1)
 	result := engine.ParseResult{}
 	profile := model.Profile{}
@@ -39,6 +41,12 @@ func parseProfile(contents []byte, name string) engine.ParseResult {
 
 		}
 	}
-	result.Items = append(result.Items, profile)
+	id := idUrlRe.FindSubmatch([]byte(url))
+	result.Items = append(result.Items, engine.Item{
+		Type:    "zhenai",
+		Url:     url,
+		Id:      string(id[1]),
+		Payload: profile,
+	})
 	return result
 }

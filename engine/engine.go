@@ -7,9 +7,9 @@ import (
 )
 
 type ConcurrentEngine struct {
-	 Scheduler Scheduler
-	 WorkerCount int
-	 ItemChan chan interface{}
+	Scheduler   Scheduler
+	WorkerCount int
+	ItemChan    chan Item
 }
 
 type Scheduler interface {
@@ -39,9 +39,9 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	}
 
 	for {
-		result := <- out
+		result := <-out
 		for _, item := range result.Items {
-			go func() {e.ItemChan <- item}()
+			go func() { e.ItemChan <- item }()
 		}
 		for _, request := range result.Requests {
 			if isDuplicate(request.Url) {
@@ -57,7 +57,7 @@ func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 	go func() {
 		for {
 			ready.WorkerReady(in)
-			request := <- in
+			request := <-in
 			result, err := worker(request)
 			if err != nil {
 				continue
@@ -78,6 +78,7 @@ func worker(r Request) (ParseResult, error) {
 }
 
 var visitedUrls = make(map[string]bool)
+
 func isDuplicate(url string) bool {
 	if visitedUrls[url] {
 		return true
